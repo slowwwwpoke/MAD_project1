@@ -1,0 +1,23 @@
+class UserPreferences {
+  bool darkMode;
+  String currency;
+
+  UserPreferences({
+    required this.darkMode,
+    required this.currency,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'darkMode': darkMode ? 1 : 0,
+      'currency': currency,
+    };
+  }
+
+  factory UserPreferences.fromMap(Map<String, dynamic> map) {
+    return UserPreferences(
+      darkMode: map['darkMode'] == 1,
+      currency: map['currency'],
+    );
+  }
+}
