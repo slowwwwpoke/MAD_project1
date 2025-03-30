@@ -1,27 +1,23 @@
 import 'package:flutter/material.dart';
 import '../models/goal_model.dart';
-import '../services/database_helper.dart';
 
 class GoalProvider with ChangeNotifier {
-  List<GoalModel> _goals = [];
+  final List<GoalModel> _goals = [];
+
   List<GoalModel> get goals => _goals;
 
-  Future<void> loadGoals() async {
-    final db = await DatabaseHelper().database;
-    final data = await db.query('goals');
-    _goals = data.map((e) => GoalModel.fromMap(e)).toList();
+  void addGoal(GoalModel goal) {
+    _goals.add(goal);
     notifyListeners();
   }
 
-  Future<void> addGoal(GoalModel goal) async {
-    final db = await DatabaseHelper().database;
-    await db.insert('goals', goal.toMap());
-    loadGoals();
+  void updateGoal(int index, double amount) {
+    _goals[index].currentAmount += amount;
+    notifyListeners();
   }
 
-  Future<void> deleteGoal(int id) async {
-    final db = await DatabaseHelper().database;
-    await db.delete('goals', where: 'id = ?', whereArgs: [id]);
-    loadGoals();
+  void deleteGoal(int id) {
+    _goals.removeWhere((goal) => goal.id == id);
+    notifyListeners();
   }
 }
