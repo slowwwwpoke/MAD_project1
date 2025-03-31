@@ -1,16 +1,15 @@
 # mad_project1
+Basic Finance Application 
 
-A new Flutter project.
+Finance Application to let users keep track of transactions and make goals. 
 
-## Getting Started
+Models create a framework for transactions and goals, json maps for local storage. 
 
-This project is a starting point for a Flutter application.
+Providers provide methods to be used in screens and manage the theme changes.
 
-A few resources to get you started if this is your first Flutter project:
+Screens provide UI for users to interact with and call methods from providers based on user input. 
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Services folder contains database_helper.dart to keep local storage for a device. 
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Widgets folder contains transaction.tile.dart that provides basic UI when a user wants to add a transaction, not a screen since it is more similar to a popup prompt.
+
