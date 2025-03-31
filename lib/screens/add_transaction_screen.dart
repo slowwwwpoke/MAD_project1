@@ -29,6 +29,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
     }
 
     final newTransaction = TransactionModel(
+      id: DateTime.now().millisecondsSinceEpoch,  // Use the current timestamp as the ID
       type: _selectedType,
       category: _selectedType == 'Income' ? 'Income' : _selectedCategory!,
       amount: amount,

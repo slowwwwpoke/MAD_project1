@@ -12,4 +12,22 @@ class GoalModel {
     required this.currentAmount,
     required this.deadline,
   });
+
+  // Convert Goal to JSON
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'targetAmount': targetAmount,
+        'currentAmount': currentAmount,
+        'deadline': deadline.toIso8601String(),
+      };
+
+  // Create Goal from JSON
+  factory GoalModel.fromJson(Map<String, dynamic> json) => GoalModel(
+        id: json['id'],
+        title: json['title'],
+        targetAmount: json['targetAmount'],
+        currentAmount: json['currentAmount'],
+        deadline: DateTime.parse(json['deadline']),
+      );
 }

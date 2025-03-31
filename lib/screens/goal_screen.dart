@@ -23,7 +23,7 @@ class GoalScreen extends StatelessWidget {
             trailing: IconButton(
               icon: const Icon(Icons.delete),
               onPressed: () {
-                goalProvider.deleteGoal(goal.id!);
+                _showDeleteConfirmationDialog(context, goal, goalProvider);
               },
             ),
           );
@@ -34,6 +34,32 @@ class GoalScreen extends StatelessWidget {
           _showAddGoalDialog(context);
         },
         child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  void _showDeleteConfirmationDialog(
+      BuildContext context, GoalModel goal, GoalProvider goalProvider) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Confirm Deletion'),
+        content: const Text('Are you sure you want to delete this goal?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx); // Dismiss dialog
+            },
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              goalProvider.deleteGoal(goal.id!);
+              Navigator.pop(ctx); // Close dialog after deletion
+            },
+            child: const Text('Delete'),
+          ),
+        ],
       ),
     );
   }
@@ -69,6 +95,13 @@ class GoalScreen extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
+              if (_goalTitleController.text.isEmpty ||
+                  _targetAmountController.text.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please fill all fields')),
+                );
+                return;
+              }
               final newGoal = GoalModel(
                 title: _goalTitleController.text,
                 targetAmount: double.parse(_targetAmountController.text),
@@ -76,7 +109,7 @@ class GoalScreen extends StatelessWidget {
                 deadline: DateTime.now().add(const Duration(days: 30)),
               );
               Provider.of<GoalProvider>(context, listen: false).addGoal(newGoal);
-              Navigator.pop(ctx);
+              Navigator.pop(ctx); // Close dialog after adding goal
             },
             child: const Text('Add'),
           ),
