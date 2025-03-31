@@ -57,4 +57,9 @@ class TransactionProvider with ChangeNotifier {
     String transactionsString = json.encode(transactionsJson);
     await prefs.setString('transactions', transactionsString);
   }
+  void deleteTransaction(int id) {
+  _transactions.removeWhere((transaction) => transaction.id == id);
+  _saveTransactions(); // Save updated list to SharedPreferences
+  notifyListeners();
+}
 }

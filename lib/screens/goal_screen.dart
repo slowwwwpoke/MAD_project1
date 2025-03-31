@@ -3,7 +3,19 @@ import 'package:provider/provider.dart';
 import '../models/goal_model.dart';
 import '../providers/goal_provider.dart';
 
-class GoalScreen extends StatelessWidget {
+class GoalScreen extends StatefulWidget {
+  @override
+  _GoalScreenState createState() => _GoalScreenState();
+}
+
+class _GoalScreenState extends State<GoalScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // Load goals from SharedPreferences when the screen is loaded
+    Provider.of<GoalProvider>(context, listen: false).loadGoals();
+  }
+
   @override
   Widget build(BuildContext context) {
     final goalProvider = Provider.of<GoalProvider>(context);
@@ -17,14 +29,37 @@ class GoalScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           final goal = goalProvider.goals[index];
           double progress = (goal.currentAmount / goal.targetAmount) * 100;
+
           return ListTile(
-            title: Text(goal.title),
-            subtitle: Text('${progress.toStringAsFixed(1)}% completed'),
-            trailing: IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: () {
-                _showDeleteConfirmationDialog(context, goal, goalProvider);
+            leading: Checkbox(
+              value: goal.isCompleted,
+              onChanged: (value) {
+                goalProvider.toggleGoalCompletion(index);
               },
+            ),
+            title: Text(
+              goal.title,
+              style: TextStyle(
+                decoration: goal.isCompleted ? TextDecoration.lineThrough : null, // Strike-through if completed
+              ),
+            ),
+            subtitle: Text('${progress.toStringAsFixed(1)}% completed'),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () {
+                    _showCustomAmountDialog(context, goalProvider, index);
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () {
+                    goalProvider.deleteGoal(goal.id);
+                  },
+                ),
+              ],
             ),
           );
         },
@@ -34,32 +69,6 @@ class GoalScreen extends StatelessWidget {
           _showAddGoalDialog(context);
         },
         child: const Icon(Icons.add),
-      ),
-    );
-  }
-
-  void _showDeleteConfirmationDialog(
-      BuildContext context, GoalModel goal, GoalProvider goalProvider) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Confirm Deletion'),
-        content: const Text('Are you sure you want to delete this goal?'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx); // Dismiss dialog
-            },
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              goalProvider.deleteGoal(goal.id!);
-              Navigator.pop(ctx); // Close dialog after deletion
-            },
-            child: const Text('Delete'),
-          ),
-        ],
       ),
     );
   }
@@ -95,23 +104,51 @@ class GoalScreen extends StatelessWidget {
           ),
           ElevatedButton(
             onPressed: () {
-              if (_goalTitleController.text.isEmpty ||
-                  _targetAmountController.text.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please fill all fields')),
-                );
-                return;
-              }
               final newGoal = GoalModel(
+                id: DateTime.now().millisecondsSinceEpoch,
                 title: _goalTitleController.text,
                 targetAmount: double.parse(_targetAmountController.text),
                 currentAmount: 0,
                 deadline: DateTime.now().add(const Duration(days: 30)),
+                isCompleted: false,
               );
               Provider.of<GoalProvider>(context, listen: false).addGoal(newGoal);
-              Navigator.pop(ctx); // Close dialog after adding goal
+              Navigator.pop(ctx);
             },
             child: const Text('Add'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCustomAmountDialog(
+      BuildContext context, GoalProvider goalProvider, int index) {
+    final _amountController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Add Amount to Goal'),
+        content: TextField(
+          controller: _amountController,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(labelText: 'Amount to Add'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+            },
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              double amountToAdd = double.parse(_amountController.text);
+              goalProvider.updateGoalProgress(index, amountToAdd);
+              Navigator.pop(ctx);
+            },
+            child: const Text('Add Amount'),
           ),
         ],
       ),

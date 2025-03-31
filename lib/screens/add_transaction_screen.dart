@@ -70,7 +70,7 @@ class _AddTransactionScreenState extends State<AddTransactionScreen> {
 
             const SizedBox(height: 16),
 
-            // Category Dropdown (Hidden for Income)
+            // Category Dropdown, hidden for Income
             if (_selectedType == 'Expense')
               DropdownButton<String>(
                 value: _selectedCategory,
