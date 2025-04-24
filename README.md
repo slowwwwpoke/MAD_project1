@@ -7,7 +7,7 @@ The Finance Application to let users keep track of transactions and make goals.
 
 Models create a framework for transactions and goals, json maps for local storage. 
 
-Providers provide methods to be used in screens and manage the theme changes.
+Providers provide methods to be used in the screen and manage the theme changes.
 
 Screens provide UI for users to interact with and call methods from providers based on user input. 
 
